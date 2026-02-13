@@ -38,6 +38,9 @@
 
 import javax.net.ssl.*;
 import javax.net.ssl.SSLEngineResult.*;
+
+import jdk.test.lib.security.SecurityUtils;
+
 import java.io.*;
 import java.security.*;
 import java.nio.*;
@@ -183,7 +186,9 @@ public class LargeBufs {
     public static void main(String args[]) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!SecurityUtils.isFIPS()) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         LargeBufs test;
 

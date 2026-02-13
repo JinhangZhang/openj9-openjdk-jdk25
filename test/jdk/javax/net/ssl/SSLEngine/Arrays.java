@@ -187,11 +187,13 @@ public class Arrays {
         contextVersion = args[0];
         // Re-enable context version if it is disabled.
         // If context version is SSLv3, TLSv1 needs to be re-enabled.
-        if (contextVersion.equals("SSLv3")) {
-            SecurityUtils.removeFromDisabledTlsAlgs("TLSv1");
-        } else if (contextVersion.equals("TLSv1") ||
-                   contextVersion.equals("TLSv1.1")) {
-            SecurityUtils.removeFromDisabledTlsAlgs(contextVersion);
+        if (!SecurityUtils.isFIPS()) {
+            if (contextVersion.equals("SSLv3")) {
+                SecurityUtils.removeFromDisabledTlsAlgs("TLSv1");
+            } else if (contextVersion.equals("TLSv1") ||
+                    contextVersion.equals("TLSv1.1")) {
+                SecurityUtils.removeFromDisabledTlsAlgs(contextVersion);
+            }
         }
 
         Arrays test;

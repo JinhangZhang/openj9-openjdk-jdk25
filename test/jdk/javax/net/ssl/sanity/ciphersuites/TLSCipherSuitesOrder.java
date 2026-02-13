@@ -59,7 +59,9 @@ public class TLSCipherSuitesOrder extends SSLSocketTemplate {
 
     public static void main(String[] args) {
         // Re-enable TLS_RSA_* since test depends on it.
-        SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
+        if (!(SecurityUtils.isFIPS())) {
+            SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
+        }
         PROTOCOL protocol = PROTOCOL.valueOf(args[0]);
         try {
             new TLSCipherSuitesOrder(protocol.getProtocol(),

@@ -225,9 +225,11 @@ public class TestAllSuites {
             throw new RuntimeException("Missing TLS protocol parameter.");
         }
 
-        switch(args[0]) {
-            case "TLSv1.1" -> SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1");
-            case "TLSv1.3" -> SecurityUtils.addToDisabledTlsAlgs("TLSv1.2");
+        if (!SecurityUtils.isFIPS()) {
+            switch(args[0]) {
+                case "TLSv1.1" -> SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1");
+                case "TLSv1.3" -> SecurityUtils.addToDisabledTlsAlgs("TLSv1.2");
+            }
         }
 
         TestAllSuites testAllSuites = new TestAllSuites(args[0]);

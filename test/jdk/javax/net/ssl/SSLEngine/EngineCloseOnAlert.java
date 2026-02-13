@@ -64,7 +64,9 @@ public class EngineCloseOnAlert {
 
     public static void main(String[] args) throws Exception {
         // Re-enable TLS_RSA_* since test depends on it.
-        SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
+        if (!SecurityUtils.isFIPS()) {
+            SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
+        }
         int failed = 0;
         List<TestCase> testMatrix = new LinkedList<TestCase>() {{
             add(clientReceivesAlert);

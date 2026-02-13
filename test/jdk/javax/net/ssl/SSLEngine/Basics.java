@@ -58,7 +58,9 @@ public class Basics {
 
     public static void main(String[] args) throws Exception {
         // Re-enable TLSv1.1 and TLS_RSA_* since test depends on it.
-        SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1", "TLS_RSA_*");
+        if (!SecurityUtils.isFIPS()) {
+            SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1", "TLS_RSA_*");
+        }
 
         runTest("TLSv1.3", "TLS_AES_256_GCM_SHA384");
         runTest("TLSv1.2", "TLS_RSA_WITH_AES_256_GCM_SHA384");

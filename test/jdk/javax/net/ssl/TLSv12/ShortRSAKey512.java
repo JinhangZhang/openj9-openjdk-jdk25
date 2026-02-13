@@ -32,13 +32,17 @@
  *     SunJSSE does not support dynamic system properties, no way to re-use
  *     system properties in samevm/agentvm mode.
  *
- * @library /javax/net/ssl/templates
+ * @library /javax/net/ssl/templates 
+ *          /test/lib
  * @run main/othervm ShortRSAKey512 PKIX
  * @run main/othervm ShortRSAKey512 SunX509
  */
 
 import java.io.*;
 import javax.net.ssl.*;
+
+import jdk.test.lib.security.SecurityUtils;
+
 import java.security.Security;
 
 
@@ -168,9 +172,11 @@ public class ShortRSAKey512 extends SSLContextTemplate {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "SSLv3, RC4, DH keySize < 768");
+        if (!SecurityUtils.isFIPS()) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "SSLv3, RC4, DH keySize < 768");
+        }
 
         if (debug)
             System.setProperty("javax.net.debug", "all");

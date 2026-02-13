@@ -78,6 +78,9 @@
 
 import javax.net.ssl.*;
 import javax.net.ssl.SSLEngineResult.*;
+
+import jdk.test.lib.security.SecurityUtils;
+
 import java.io.*;
 import java.security.*;
 import java.nio.*;
@@ -140,7 +143,9 @@ public class NoAuthClientAuth {
      * Main entry point for this test.
      */
     public static void main(String args[]) throws Exception {
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!SecurityUtils.isFIPS()) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         if (debug) {
             System.setProperty("javax.net.debug", "all");

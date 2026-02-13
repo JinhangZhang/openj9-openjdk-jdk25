@@ -30,6 +30,7 @@
  * @summary Consider disabling support for X.509 certificates with RSA keys
  *          less than 1024 bits
  * @library /javax/net/ssl/templates
+ *          /test/lib
  * @run main/othervm DisabledShortRSAKeys PKIX TLSv1.2
  * @run main/othervm DisabledShortRSAKeys SunX509 TLSv1.2
  * @run main/othervm DisabledShortRSAKeys PKIX TLSv1.1
@@ -43,6 +44,8 @@
 import java.io.*;
 import javax.net.ssl.*;
 import java.security.Security;
+
+import jdk.test.lib.security.SecurityUtils;
 
 public class DisabledShortRSAKeys extends SSLSocketTemplate {
 
@@ -107,10 +110,12 @@ public class DisabledShortRSAKeys extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        Security.setProperty("jdk.certpath.disabledAlgorithms",
-                "RSA keySize < 1024");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "RSA keySize < 1024");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms",
+                    "RSA keySize < 1024");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "RSA keySize < 1024");
+        }
 
         if (debug) {
             System.setProperty("javax.net.debug", "all");
@@ -122,6 +127,35 @@ public class DisabledShortRSAKeys extends SSLSocketTemplate {
         /*
          * Start the tests.
          */
-        new DisabledShortRSAKeys(tmAlgorithm, enabledProtocol).run();
+        try {
+            new DisabledShortRSAKeys(tmAlgorithm, enabledProtocol).run();
+        } catch (java.security.spec.InvalidKeySpecException ikse) {
+            if (SecurityUtils.isFIPS()) {
+                if ("Inappropriate key specification: RSA keys must be at least 1024 bits long".equals(ikse.getMessage())) {
+                    System.out.println("Expected exception msg: <"+ikse.getMessage()+"> is caught");
+                    return;
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    ikse.printStackTrace();
+                    return;
+                }
+            }
+        } catch (java.security.NoSuchAlgorithmException nsae) {
+            if (SecurityUtils.isFIPS()) {
+                if(!SecurityUtils.TLS_PROTOCOLS.contains(enabledProtocol)) {
+                    if (("java.security.NoSuchAlgorithmException: " + enabledProtocol +" SSLContext not available").equals(nsae.getMessage())) {
+                        System.out.println("Expected exception msg: <"+nsae.getMessage()+"> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    nsae.printStackTrace();
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 }

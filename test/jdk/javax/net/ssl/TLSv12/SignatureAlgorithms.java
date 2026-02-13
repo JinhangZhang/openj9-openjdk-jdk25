@@ -31,6 +31,7 @@
  * @bug 8049321
  * @summary Support SHA256WithDSA in JSSE
  * @library /javax/net/ssl/templates
+ *          /test/lib
  * @run main/othervm SignatureAlgorithms PKIX "SHA-224,SHA-256"
  *                   TLS_DHE_DSS_WITH_AES_128_CBC_SHA
  * @run main/othervm SignatureAlgorithms PKIX "SHA-1,SHA-224"
@@ -48,6 +49,9 @@
 import java.util.*;
 import java.io.*;
 import javax.net.ssl.*;
+
+import jdk.test.lib.security.SecurityUtils;
+
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -263,8 +267,10 @@ public class SignatureAlgorithms extends SSLContextTemplate {
         /*
          * Expose the target algorithms by diabling unexpected algorithms.
          */
-        Security.setProperty(
+        if (!SecurityUtils.isFIPS()) {
+            Security.setProperty(
                 "jdk.certpath.disabledAlgorithms", disabledAlgorithms);
+        }
 
         /*
          * Reset the security property to make sure that the algorithms

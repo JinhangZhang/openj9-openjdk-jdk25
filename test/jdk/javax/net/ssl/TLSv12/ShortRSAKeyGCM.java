@@ -31,6 +31,7 @@
  * @bug 7030966
  * @summary Support AEAD CipherSuites
  * @library /javax/net/ssl/templates
+ *          /test/lib
  * @run main/othervm ShortRSAKeyGCM PKIX TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
  * @run main/othervm ShortRSAKeyGCM PKIX TLS_RSA_WITH_AES_128_GCM_SHA256
  * @run main/othervm ShortRSAKeyGCM PKIX TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
@@ -60,6 +61,9 @@ import java.net.*;
 import java.util.*;
 import java.io.*;
 import javax.net.ssl.*;
+
+import jdk.test.lib.security.SecurityUtils;
+
 import java.security.Security;
 import java.security.KeyStore;
 import java.security.KeyFactory;
@@ -194,9 +198,11 @@ public class ShortRSAKeyGCM extends SSLContextTemplate {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "SSLv3, RC4, DH keySize < 768");
+        if (!SecurityUtils.isFIPS()) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "SSLv3, RC4, DH keySize < 768");
+        }
 
         if (debug) {
             System.setProperty("javax.net.debug", "all");

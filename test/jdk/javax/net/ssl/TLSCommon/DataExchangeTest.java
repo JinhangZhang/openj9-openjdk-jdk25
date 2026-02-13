@@ -34,7 +34,32 @@ public class DataExchangeTest extends SSLEngineTestCase {
     public static void main(String[] args) {
         DataExchangeTest test = new DataExchangeTest();
         setUpAndStartKDCIfNeeded();
-        test.runTests();
+        try {
+            test.runTests();
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                if(!SecurityUtils.TLS_CIPHERSUITES.containsKey(cipherSuite)) {
+                    if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                        System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                        return;
+                    } else {
+                        System.out.println("Unexpected exception msg: <" + sslhe.getMessage() + "> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    sslhe.printStackTrace();
+                    return;
+                }
+            } else {
+                System.out.println("Unexpected exception is caught in Non-FIPS mode");
+                sslhe.printStackTrace();
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     @Override

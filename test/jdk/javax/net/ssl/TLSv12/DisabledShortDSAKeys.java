@@ -28,7 +28,8 @@
  * @test
  * @bug 8139565
  * @summary Restrict certificates with DSA keys less than 1024 bits
- * @library /javax/net/ssl/templates
+ * @library /javax/net/ssl/templates 
+ *          /test/lib
  * @run main/othervm DisabledShortDSAKeys PKIX TLSv1.2
  * @run main/othervm DisabledShortDSAKeys SunX509 TLSv1.2
  * @run main/othervm DisabledShortDSAKeys PKIX TLSv1.1
@@ -52,6 +53,7 @@ import java.security.spec.*;
 import java.security.interfaces.*;
 import java.util.Base64;
 
+import jdk.test.lib.security.SecurityUtils;
 
 public class DisabledShortDSAKeys extends SSLContextTemplate {
 
@@ -173,10 +175,12 @@ public class DisabledShortDSAKeys extends SSLContextTemplate {
     volatile Exception clientException = null;
 
     public static void main(String[] args) throws Exception {
-        Security.setProperty("jdk.certpath.disabledAlgorithms",
-                "DSA keySize < 1024");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "DSA keySize < 1024");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms",
+                    "DSA keySize < 1024");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "DSA keySize < 1024");
+        }
 
         if (debug) {
             System.setProperty("javax.net.debug", "all");
@@ -190,7 +194,25 @@ public class DisabledShortDSAKeys extends SSLContextTemplate {
         /*
          * Start the tests.
          */
-        new DisabledShortDSAKeys();
+        try {
+            new DisabledShortDSAKeys();
+        } catch (java.security.NoSuchAlgorithmException nsae) {
+            if (SecurityUtils.isFIPS()) {
+                if(!SecurityUtils.TLS_PROTOCOLS.contains(enabledProtocol)) {
+                    if (("java.security.NoSuchAlgorithmException: " + enabledProtocol +" SSLContext not available").equals(nsae.getMessage())) {
+                        System.out.println("Expected exception msg: <"+nsae.getMessage()+"> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    nsae.printStackTrace();
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     Thread clientThread = null;

@@ -632,7 +632,40 @@ public class CheckTlsEngineResults {
 
     public static void main(String args[]) throws Exception {
         CheckTlsEngineResults cs = new CheckTlsEngineResults();
-        cs.test();
+        try {
+            cs.test();
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                for (String clientCipherSuite : clientEngine.getEnabledCipherSuites()) {
+                    if(!SecurityUtils.TLS_CIPHERSUITES.containsKey(clientCipherSuite)) {
+                        if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                            System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                            return;
+                        }
+                    }
+                }
+                for (String serverCipherSuite : serverEngine.getEnabledCipherSuites()) {
+                    if(!SecurityUtils.TLS_CIPHERSUITES.containsKey(serverCipherSuite)) {
+                        if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                            System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                            return;
+                        }
+                    }
+                }
+                System.out.println("Unexpected exception is caught");
+                System.out.println("Test Failed.");
+                sslhe.printStackTrace();
+                return;
+            } else {
+                System.out.println("Unexpected exception is caught");
+                System.out.println("Test Failed.");
+                sslhe.printStackTrace();
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
         System.out.println("Test Passed.");
     }
 
