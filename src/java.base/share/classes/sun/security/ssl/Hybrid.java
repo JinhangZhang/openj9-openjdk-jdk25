@@ -201,6 +201,7 @@ public class Hybrid {
                                 curve.getCurve()), curve);
                         leftKey = left.generatePublic(ecSpec);
                     } else if (leftname.startsWith("ML-KEM")) {
+                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> leftKey comes from provider: " + left.getProvider().getName());
                         leftKey = left.generatePublic(new RawKeySpec(
                                 leftKeyBytes));
                     } else {
@@ -215,6 +216,7 @@ public class Hybrid {
                                 new BigInteger(1, rightKeyBytes));
                         rightKey = right.generatePublic(xecSpec);
                     } else if (rightname.startsWith("ML-KEM")) {
+                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> rightKey comes from provider: " + right.getProvider().getName());
                         rightKey = right.generatePublic(new RawKeySpec(
                                 rightKeyBytes));
                     } else {
@@ -270,6 +272,8 @@ public class Hybrid {
                 throws NoSuchAlgorithmException {
             this.left = getKEM(left);
             this.right = getKEM(right);
+            System.out.println("JDK25 -> Hybrid -> KEMImpl -> constructor() -> left comes from provider: " + this.left.getProvider().getName());
+            System.out.println("JDK25 -> Hybrid -> KEMImpl -> constructor() -> right comes from provider: " + this.right.getProvider().getName());
         }
 
         @Override
@@ -326,6 +330,12 @@ public class Hybrid {
 
             var left  = le.encapsulate();
             var right = re.encapsulate();
+            
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Encapsulator -> left comes from provider: " + le.providerName());
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Encapsulator -> right comes from provider: " + re.providerName());
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Decapsulator -> left comes from provider: " + ld.providerName());
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Decapsulator -> right comes from provider: " + rd.providerName());
+
             return new KEM.Encapsulated(
                     new SecretKeyImpl(left.key(), right.key()),
                     concat(left.encapsulation(), right.encapsulation()),
@@ -372,6 +382,11 @@ public class Hybrid {
             var left = Arrays.copyOf(encapsulation, ld.encapsulationSize());
             var right = Arrays.copyOfRange(encapsulation,
                     ld.encapsulationSize(), encapsulation.length);
+            
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Encapsulator -> left comes from provider: " + le.providerName());
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Encapsulator -> right comes from provider: " + re.providerName());
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Decapsulator -> left comes from provider: " + ld.providerName());
+            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Decapsulator -> right comes from provider: " + rd.providerName());
             return new SecretKeyImpl(
                     ld.decapsulate(left),
                     rd.decapsulate(right)
@@ -422,6 +437,8 @@ public class Hybrid {
         // left and right public keys.
         @Override
         public byte[] getEncoded() {
+            System.out.println("JDK25 -> Hybrid -> PublicKeyImpl -> getEncoded() -> left comes from provider: " + left.getProvider().getName());
+            System.out.println("JDK25 -> Hybrid -> PublicKeyImpl -> getEncoded() -> right comes from provider: " + right.getProvider().getName());
             return concat(onlyKey(left), onlyKey(right));
         }
 
