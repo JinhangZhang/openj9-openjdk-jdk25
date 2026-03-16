@@ -272,8 +272,6 @@ public class Hybrid {
                 throws NoSuchAlgorithmException {
             this.left = getKEM(left);
             this.right = getKEM(right);
-            System.out.println("JDK25 -> Hybrid -> KEMImpl -> constructor() -> left comes from provider: " + this.left.getProvider().getName());
-            System.out.println("JDK25 -> Hybrid -> KEMImpl -> constructor() -> right comes from provider: " + this.right.getProvider().getName());
         }
 
         @Override
@@ -437,8 +435,6 @@ public class Hybrid {
         // left and right public keys.
         @Override
         public byte[] getEncoded() {
-            System.out.println("JDK25 -> Hybrid -> PublicKeyImpl -> getEncoded() -> left comes from provider: " + left.getProvider().getName());
-            System.out.println("JDK25 -> Hybrid -> PublicKeyImpl -> getEncoded() -> right comes from provider: " + right.getProvider().getName());
             return concat(onlyKey(left), onlyKey(right));
         }
 
