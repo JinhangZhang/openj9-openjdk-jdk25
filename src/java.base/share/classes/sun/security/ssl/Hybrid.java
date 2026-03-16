@@ -331,8 +331,6 @@ public class Hybrid {
             
             System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Encapsulator -> left comes from provider: " + le.providerName());
             System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Encapsulator -> right comes from provider: " + re.providerName());
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Decapsulator -> left comes from provider: " + ld.providerName());
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Decapsulator -> right comes from provider: " + rd.providerName());
 
             return new KEM.Encapsulated(
                     new SecretKeyImpl(left.key(), right.key()),
@@ -381,8 +379,6 @@ public class Hybrid {
             var right = Arrays.copyOfRange(encapsulation,
                     ld.encapsulationSize(), encapsulation.length);
             
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Encapsulator -> left comes from provider: " + le.providerName());
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Encapsulator -> right comes from provider: " + re.providerName());
             System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Decapsulator -> left comes from provider: " + ld.providerName());
             System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Decapsulator -> right comes from provider: " + rd.providerName());
             return new SecretKeyImpl(
