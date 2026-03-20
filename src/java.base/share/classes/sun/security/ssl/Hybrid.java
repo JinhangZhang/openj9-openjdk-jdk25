@@ -201,7 +201,6 @@ public class Hybrid {
                                 curve.getCurve()), curve);
                         leftKey = left.generatePublic(ecSpec);
                     } else if (leftname.startsWith("ML-KEM")) {
-                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> leftKey comes from provider: " + left.getProvider().getName());
                         leftKey = left.generatePublic(new RawKeySpec(
                                 leftKeyBytes));
                     } else {
@@ -216,7 +215,6 @@ public class Hybrid {
                                 new BigInteger(1, rightKeyBytes));
                         rightKey = right.generatePublic(xecSpec);
                     } else if (rightname.startsWith("ML-KEM")) {
-                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> rightKey comes from provider: " + right.getProvider().getName());
                         rightKey = right.generatePublic(new RawKeySpec(
                                 rightKeyBytes));
                     } else {
@@ -328,9 +326,6 @@ public class Hybrid {
 
             var left  = le.encapsulate();
             var right = re.encapsulate();
-            
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Encapsulator -> left comes from provider: " + le.providerName());
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineEncapsulate -> Encapsulator -> right comes from provider: " + re.providerName());
 
             return new KEM.Encapsulated(
                     new SecretKeyImpl(left.key(), right.key()),
@@ -379,8 +374,6 @@ public class Hybrid {
             var right = Arrays.copyOfRange(encapsulation,
                     ld.encapsulationSize(), encapsulation.length);
             
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Decapsulator -> left comes from provider: " + ld.providerName());
-            System.out.println("JDK25 -> Hybrid -> Handler -> engineDecapsulate -> Decapsulator -> right comes from provider: " + rd.providerName());
             return new SecretKeyImpl(
                     ld.decapsulate(left),
                     rd.decapsulate(right)
