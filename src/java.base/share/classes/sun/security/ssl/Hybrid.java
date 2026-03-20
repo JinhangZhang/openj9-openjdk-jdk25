@@ -195,12 +195,14 @@ public class Hybrid {
 
                 try {
                     if (leftname.startsWith("secp")) {
+                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> leftname is:" + leftname + " leftKey comes from provider: " + left.getProvider().getName());
                         var curve = CurveDB.lookup(leftname);
                         var ecSpec = new ECPublicKeySpec(
                                 ECUtil.decodePoint(leftKeyBytes,
                                 curve.getCurve()), curve);
                         leftKey = left.generatePublic(ecSpec);
                     } else if (leftname.startsWith("ML-KEM")) {
+                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> leftname is:" + leftname + " leftKey comes from provider: " + left.getProvider().getName());
                         leftKey = left.generatePublic(new RawKeySpec(
                                 leftKeyBytes));
                     } else {
@@ -209,12 +211,14 @@ public class Hybrid {
                     }
 
                     if (rightname.equals("X25519")) {
+                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> rightname is:" + rightname + " leftKey comes from provider: " + right.getProvider().getName());
                         ArrayUtil.reverse(rightKeyBytes);
                         var xecSpec = new XECPublicKeySpec(
                                 new NamedParameterSpec(rightname),
                                 new BigInteger(1, rightKeyBytes));
                         rightKey = right.generatePublic(xecSpec);
                     } else if (rightname.startsWith("ML-KEM")) {
+                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> rightname is:" + rightname + " leftKey comes from provider: " + right.getProvider().getName());
                         rightKey = right.generatePublic(new RawKeySpec(
                                 rightKeyBytes));
                     } else {

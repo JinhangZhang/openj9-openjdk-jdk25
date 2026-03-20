@@ -130,6 +130,7 @@ public class KAKeyDerivation implements SSLKeyDerivation {
                 // HKDF-Extract(0, 0).
                 byte[] zeros = new byte[hashAlg.hashLength];
                 KDF hkdf = KDF.getInstance(hashAlg.hkdfAlgorithm);
+                System.out.println("JDK25 -> KAKeyDerivation -> deriveHandshakeSecret -> kd == null KDF from :" + hkdf.getProviderName());
                 earlySecret = hkdf.deriveKey("TlsEarlySecret",
                         HKDFParameterSpec.ofExtract().addSalt(zeros)
                         .addIKM(zeros).extractOnly());
@@ -144,6 +145,7 @@ public class KAKeyDerivation implements SSLKeyDerivation {
             // the handshake secret key derivation (below) as it may not
             // work with the "sharedSecret" obj.
             KDF hkdf = KDF.getInstance(hashAlg.hkdfAlgorithm);
+            System.out.println("JDK25 -> KAKeyDerivation -> deriveHandshakeSecret -> KDF from :" + hkdf.getProviderName());
             var spec = HKDFParameterSpec.ofExtract().addSalt(saltSecret);
             if (sharedSecret instanceof Hybrid.SecretKeyImpl hsk) {
                 spec = spec.addIKM(hsk.k1()).addIKM(hsk.k2());
