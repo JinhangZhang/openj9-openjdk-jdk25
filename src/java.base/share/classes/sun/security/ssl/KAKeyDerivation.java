@@ -24,6 +24,7 @@
  */
 package sun.security.ssl;
 
+import sun.security.util.Debug;
 import sun.security.util.RawKeySpec;
 
 import javax.crypto.KDF;
@@ -53,6 +54,7 @@ public class KAKeyDerivation implements SSLKeyDerivation {
     private final PublicKey peerPublicKey;
     private final byte[] keyshare;
     private final Provider provider;
+    private static final Debug debug = Debug.getInstance("kakeyderivation");
 
     // Constructor called by Key Agreement
     KAKeyDerivation(String algorithmName,
@@ -130,7 +132,9 @@ public class KAKeyDerivation implements SSLKeyDerivation {
                 // HKDF-Extract(0, 0).
                 byte[] zeros = new byte[hashAlg.hashLength];
                 KDF hkdf = KDF.getInstance(hashAlg.hkdfAlgorithm);
-                System.out.println("JDK25 -> KAKeyDerivation -> deriveHandshakeSecret -> kd == null KDF from :" + hkdf.getProviderName());
+                if (debug != null) {
+                    debug.println("No PSK is in use, the KDF from: " + hkdf.getProviderName());
+                }
                 earlySecret = hkdf.deriveKey("TlsEarlySecret",
                         HKDFParameterSpec.ofExtract().addSalt(zeros)
                         .addIKM(zeros).extractOnly());
@@ -145,7 +149,9 @@ public class KAKeyDerivation implements SSLKeyDerivation {
             // the handshake secret key derivation (below) as it may not
             // work with the "sharedSecret" obj.
             KDF hkdf = KDF.getInstance(hashAlg.hkdfAlgorithm);
-            System.out.println("JDK25 -> KAKeyDerivation -> deriveHandshakeSecret -> KDF from :" + hkdf.getProviderName());
+            if (debug != null) {
+                debug.println(" derive handshake secret the KDF from: " + hkdf.getProviderName());
+            }
             var spec = HKDFParameterSpec.ofExtract().addSalt(saltSecret);
             if (sharedSecret instanceof Hybrid.SecretKeyImpl hsk) {
                 spec = spec.addIKM(hsk.k1()).addIKM(hsk.k2());

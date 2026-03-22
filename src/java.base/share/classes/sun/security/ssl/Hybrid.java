@@ -27,6 +27,7 @@ package sun.security.ssl;
 
 import sun.security.util.ArrayUtil;
 import sun.security.util.CurveDB;
+import sun.security.util.Debug;
 import sun.security.util.ECUtil;
 import sun.security.util.RawKeySpec;
 import sun.security.x509.X509Key;
@@ -81,6 +82,8 @@ public class Hybrid {
         }
     }
 
+    private static final Debug debug = Debug.getInstance("hybrid");
+
     private static KeyPairGenerator getKeyPairGenerator(String name) throws
             NoSuchAlgorithmException {
         if (name.startsWith("secp")) {
@@ -123,6 +126,9 @@ public class Hybrid {
                 throws NoSuchAlgorithmException  {
             left = getKeyPairGenerator(leftAlg);
             right = getKeyPairGenerator(rightAlg);
+            if (debug != null) {
+                debug.println(leftAlg + " comes from " + left.getProvider().getName() + ", " + rightAlg + " comes from " + right.getProvider().getName());
+            }
             leftSpec = getSpec(leftAlg);
             rightSpec = getSpec(rightAlg);
         }
@@ -163,6 +169,9 @@ public class Hybrid {
                 throws NoSuchAlgorithmException {
             this.left = getKeyFactory(left);
             this.right = getKeyFactory(right);
+            if (debug != null) {
+                debug.println(left + " comes from " + this.left.getProvider().getName() + ", " + right + " comes from " + this.right.getProvider().getName());
+            }
             this.leftlen = leftPublicLength(left);
             this.leftname = left;
             this.rightname = right;
@@ -195,14 +204,12 @@ public class Hybrid {
 
                 try {
                     if (leftname.startsWith("secp")) {
-                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> leftname is:" + leftname + " leftKey comes from provider: " + left.getProvider().getName());
                         var curve = CurveDB.lookup(leftname);
                         var ecSpec = new ECPublicKeySpec(
                                 ECUtil.decodePoint(leftKeyBytes,
                                 curve.getCurve()), curve);
                         leftKey = left.generatePublic(ecSpec);
                     } else if (leftname.startsWith("ML-KEM")) {
-                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> leftname is:" + leftname + " leftKey comes from provider: " + left.getProvider().getName());
                         leftKey = left.generatePublic(new RawKeySpec(
                                 leftKeyBytes));
                     } else {
@@ -211,14 +218,12 @@ public class Hybrid {
                     }
 
                     if (rightname.equals("X25519")) {
-                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> rightname is:" + rightname + " leftKey comes from provider: " + right.getProvider().getName());
                         ArrayUtil.reverse(rightKeyBytes);
                         var xecSpec = new XECPublicKeySpec(
                                 new NamedParameterSpec(rightname),
                                 new BigInteger(1, rightKeyBytes));
                         rightKey = right.generatePublic(xecSpec);
                     } else if (rightname.startsWith("ML-KEM")) {
-                        System.out.println("JDK25 -> Hybrid -> KeyFactoryImpl -> engineGeneratePublic -> rightname is:" + rightname + " leftKey comes from provider: " + right.getProvider().getName());
                         rightKey = right.generatePublic(new RawKeySpec(
                                 rightKeyBytes));
                     } else {
