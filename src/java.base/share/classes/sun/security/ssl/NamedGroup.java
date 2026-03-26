@@ -946,6 +946,11 @@ enum NamedGroup {
                         SSLLogger.isOn && SSLLogger.isOn("ssl")) {
                     SSLLogger.warning("No default named groups");
                 }
+
+                if (!groupList.isEmpty() &&
+                        SSLLogger.isOn && SSLLogger.isOn("ssl")) {
+                    SSLLogger.finer(groupList.toArray(new String[0]));
+                }
             }
 
             namedGroups = groupList.toArray(new String[0]);
