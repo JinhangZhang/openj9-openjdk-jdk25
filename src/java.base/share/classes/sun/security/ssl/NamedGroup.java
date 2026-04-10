@@ -949,7 +949,7 @@ enum NamedGroup {
 
                 if (!groupList.isEmpty() &&
                         SSLLogger.isOn && SSLLogger.isOn("ssl")) {
-                    SSLLogger.finer(groupList.toArray(new String[0]));
+                    SSLLogger.finer(String.join(", ", groupList));
                 }
             }
 
