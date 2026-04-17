@@ -292,7 +292,7 @@ public class Hybrid {
             this.left = getKEM(left);
             this.right = getKEM(right);
             leftname = left;
-            rightname = rightname;
+            rightname = right;
         }
 
         @Override
