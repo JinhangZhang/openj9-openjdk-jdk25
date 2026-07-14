@@ -137,6 +137,7 @@ public class SeedOrExpanded {
         System.setProperty("jdk." + type + ".pkcs8.encoding", "expandedkey");
         System.out.println("kf provider is: " + kf.getProvider().getName());
         System.out.println("2. g provider is: " + g.getProvider().getName());
+        System.out.println("kBoth getAlgorithm: " + kBoth.getAlgorithm());
         Asserts.assertEqualsByteArray(
                 test(alg, pk, kf.translateKey(kBoth)).getEncoded(),
                 kExpandedEncoded);
