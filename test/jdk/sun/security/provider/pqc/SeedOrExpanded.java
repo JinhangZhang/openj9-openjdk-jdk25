@@ -87,6 +87,7 @@ public class SeedOrExpanded {
         // Invalid property value
         System.setProperty("jdk." + type + ".pkcs8.encoding", "bogus");
         g.initialize(-1, new FixedSecureRandom(seed));
+        System.out.println("g provider is: " + g.getProvider().getName());
         Asserts.assertThrows(IllegalArgumentException.class,
                 () -> g.generateKeyPair().getPrivate());
 
