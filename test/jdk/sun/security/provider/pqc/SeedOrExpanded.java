@@ -128,15 +128,11 @@ public class SeedOrExpanded {
         var kf = KeyFactory.getInstance(alg);
         System.out.println("1. kf provider is: " + kf.getProvider().getName());
         System.setProperty("jdk." + type + ".pkcs8.encoding", "seed");
-        System.out.println("2. kf provider is: " + kf.getProvider().getName());
         Asserts.assertEqualsByteArray(
                 test(alg, pk, kf.translateKey(kBoth)).getEncoded(),
                 kSeedEncoded);
-        System.out.println("3. kf provider is: " + kf.getProvider().getName());
         Asserts.assertTrue(kf.translateKey(kSeed) == kSeed);
-        System.out.println("4. kf provider is: " + kf.getProvider().getName());
         Asserts.assertThrows(InvalidKeyException.class, () -> kf.translateKey(kExpanded));
-        System.out.println("5. kf provider is: " + kf.getProvider().getName());
 
         System.setProperty("jdk." + type + ".pkcs8.encoding", "expandedkey");
         System.out.println("kf provider is: " + kf.getProvider().getName());
